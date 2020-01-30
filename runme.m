@@ -1,4 +1,4 @@
-% Matlab script that demonstrates infrasound slowness inversion for source backazimuht and
+%  script that demonstrates infrasound slowness inversion for source backazimuht and
 % apparent horizontal velocity, including associated uncertainites. 
 % Please, note that the script is provided as a "recipe" for the implementation of the array processing. 
 % Users that intend to apply the same processing to their own data will need to adapt this script to their specific
