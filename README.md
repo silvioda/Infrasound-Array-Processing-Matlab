@@ -1,2 +1,2 @@
-# Infrasound-Array-Processing
+# Infrasound-Array-Processing Matlab
 NEEDS SOME TEXT
