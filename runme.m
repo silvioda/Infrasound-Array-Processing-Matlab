@@ -1,11 +1,11 @@
 % Matlab script that demonstrates infrasound slowness inversion for source backazimuht and
-% apparent horizontal velocity, including associated uncertainites. 
-% Please, note that the script is provided as a "recipe" for the implementation of the array processing. 
-% Users that intend to apply the same processing to their own data will need to adapt this script to their specific
-% requirements. 
-% 
-% The script follows the workflow discussed in:
-% De Angelis et al. (2020) ......
+% apparent horizontal velocity, including associated uncertainites.
+% Please, note that the script is provided as a "recipe" for the implementation of the array processing.
+% Users wishing to apply the same processing to their own data will need to adapt this script to their specific
+% requirements.
+%
+% The script follows the workflow of:
+% De Angelis et al. (2020), Uncertainty in detection of volcanic activity using infrasound arrays: examples from Mt.Etna, Italy
 %
 % Dependencies: GISMO toolbox for Matlab, not provided here but freely available at: https://geoscience-community-codes.github.io/GISMO/
 
@@ -15,19 +15,30 @@
 
 % Housekeeping
 clear all;
+close all;
 
 %% Add functions and colormap folder to path
-addpath ./functions;
+addpath ./src;
 addpath ./cmaps;
 
 %% USER INPUTS
 % Save output here
 outdir = './output';
-plotOutput = './plot/out.png';
+plotdir = './figures';
+plotOutput = './figures/out.png';
 
-% Flag for final plot. 1 if a figure is wanted, 0 if not. As default,
-% figure is not saved
-plotFlag = 0;
+if ~exist(outdir, 'dir')
+    mkdir(outdir)
+end
+
+if ~exist(plotdir, 'dir')
+    mkdir(plotdir)
+end
+
+
+% Flag for final plot. 1 if a plot of results is wanted, 0 if not. A .png
+% figure is also saved if plot is wanted.
+plotFlag = 1;
 
 % Name of array
 arr_name = 'ENCR';
@@ -46,7 +57,7 @@ outDir = './output';
 
 % Start and end date/time of period to analyse
 snum = datenum(2019,07,27,15,0,0);
-enum = datenum(2019,07,27,18,0,0);
+enum = datenum(2019,07,27,21,0,0);
 
 % Sampling frequency of data
 fs = 100;
@@ -59,7 +70,7 @@ taper_val = 0.1; % 0.1 == 10% of trace, 5% at each end
 
 % Bandpass filter cutoff
 f1 = 1;
-f2 = 10;
+f2 = 15;
 
 % Width (seconds) of sliding window for slowness inversion
 window_length = 20;
@@ -121,7 +132,7 @@ for ii = 1:length(tvec1)-1
     w = w*cal;
     
     % Apply bandpass filter
-    f = filterobject('b', [1 10], 2);
+    f = filterobject('b', [f1 f2], 2);
     w = filtfilt(f,w);
     
     % Get the start and end times of sliding windows
@@ -167,7 +178,7 @@ end
 % Housekeeping
 clearvars -except outdir plotFlag plotOutput
 
-%% Import and plot output if required by user
+%% Import and plot output if required by user. WARNING: This is specific to the data provided as an example with this script
 if plotFlag == 1
     
     [tvec, azi, velo, azi_err, velo_err, MCMM] =  import_output(outdir);
@@ -182,11 +193,11 @@ if plotFlag == 1
     velAxLims = [300 400];
     
     % Remove low-quality detections or non-detections (unreasonably large
-    % uncertainties and low values of mcmm). The inversion processing saves 
+    % uncertainties and low values of mcmm). The inversion processing saves
     % all results for every data window analysed irrespective of data coherence
-    % across the array.  
+    % across the array.
     
-    % Only select results from analyses with MCMM > 0.5 (this should suffice to identify only true volcanic 
+    % Only select results from analyses with MCMM > 0.5 (this should suffice to identify only true volcanic
     % activity - or any other coherent signal across the array).
     
     [a,~] = find(MCMM > 0.5);
@@ -197,8 +208,11 @@ if plotFlag == 1
     tvec = tvec(a);
     MCMM = MCMM(a);
     
-    % Only results from analyses with back-azimuth error < 2 degrees
-    [a,~] = find(azi_err < 2);
+    % For a clean plot. Only results from analyses with back-azimuth error
+    % < 3 degrees. Quick and dirty way to remove the odd outlier with very
+    % large error that saturates the error colorbar.
+    
+    [a,~] = find(azi_err < 3);
     azi = azi(a);
     velo = velo(a);
     azi_err = azi_err(a);
@@ -206,7 +220,7 @@ if plotFlag == 1
     tvec = tvec(a);
     MCMM = MCMM(a);
     
-    % Create figure
+    % Create figure 
     figure1 = figure;
     set(figure1, 'Position', [190   370   940   425]);
     % Create axes
@@ -235,7 +249,7 @@ if plotFlag == 1
     hold on;
     plot(tvec, 69*ones(length(tvec),1), '--k', 'LineWidth', 2);
     text(tvec(end-10),80,'NSEC');
-    ylabel('Backazimuth [deg from N]');
+    ylabel('DOA [deg from N]');
     xlabel('Time [hh:mm]');
     ylim(azAxLims)
     set(axes2, 'colormap', cmap1);
@@ -243,7 +257,8 @@ if plotFlag == 1
     c2.Label.String = '\sigma_{az} [deg]';
     %Datetime on horizontal axis
     datetick2('x', 'HH:MM');
-    
+    % Comment the line below to not save figure  
+    saveas(figure1, plotOutput, 'png')
 else
     
 end

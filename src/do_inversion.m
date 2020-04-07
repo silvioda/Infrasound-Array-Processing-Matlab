@@ -1,15 +1,22 @@
 function [v, srcaz, cmax, sig2th, sig2vl, sig2dt] = do_inversion(D)
 %INVERSION Invert array infrasound data for backazimuth to the source and apparent horizontal velocity across the array
 %
-%   [V, SRCAZ, CMAX, SIG2TH, SIG2VL, SIG2TAU] = inversion(D) Perform array slowness inversion for infrasound 
+%   [V, SRCAZ, CMAX, SIG2TH, SIG2VL, SIG2TAU, SIG2DT] = inversion(D) Perform array slowness inversion for infrasound 
 %   data from N channels stored in Matlab structure D of size 1XN and fields: 
 %                                
-%     D(i).data = Infrasound data
-%     D(i).stalat = Microphone latitude
-%     D(i).stalon = Microphone longitude
-%     D(i).fs = Data sampling frequency
+%     D(i).data = Infrasound data (i-th channel)
+%     D(i).stalat = Microphone latitude (i-th channel)
+%     D(i).stalon = Microphone longitude (i-th channel)
+%     D(i).fs = Data sampling frequency (i-th channel)
 %
-%   The function returns .....
+%   The function returns:
+%
+%     v = Apparent horizontal velocity across the array for each processing data window 
+%     srcaz = Direction of Arrival (DOA) for each processing data window
+%     cmax = Max multistation cross-correlation coefficient  
+%     sig2th = variance of DOA for each processing data window 
+%     sig2vl = Variance of v for each processing data window  
+%     sig2dt = Variance of time delay measurements for each processing data window
 
 % Author: Silvio De Angelis, University of Liverpool
 % Version: 1.0 

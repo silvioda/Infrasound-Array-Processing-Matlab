@@ -1,5 +1,5 @@
 function [start_num, end_num] = do_overlap(snum, enum, win_sec, overlap_sec, fs)
-% MAKE_OVERLAP Calculate start and end times of sliding window along a data vector including overlap.
+% DO_OVERLAP Calculate start and end times of sliding window along a data vector including overlap.
 
 % Author: Silvio De Angelis, University of Liverpool
 % Version: 1.0 
